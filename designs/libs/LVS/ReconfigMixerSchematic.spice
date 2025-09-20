@@ -1,0 +1,173 @@
+** sch_path: /foss/designs/M9-ProfMorbius-RF-Chip/designs/libs/LVS/ReconfigMixerRev.sch
+**.subckt ReconfigMixerRev AGND RF- IF+ VDD_M9 LO+ LO- IF- RF+ VDDBias MOSBIUS VINSwitch
+*.ipin AGND
+*.iopin RF-
+*.iopin IF+
+*.ipin VDD_M9
+*.ipin LO+
+*.ipin LO-
+*.iopin IF-
+*.iopin RF+
+*.ipin VDDBias
+*.iopin MOSBIUS
+*.ipin VINSwitch
+XM8 net1 net1 AGND AGND nfet_03v3 L={L_min} W={W_bias_ref} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM1 net2 net1 AGND AGND nfet_03v3 L={L_min} W={W_bias_out} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM3 net9 net5 net3 AGND nfet_03v3 L={L_min} W={W_rf} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM2 net8 net7 net3 AGND nfet_03v3 L={L_min} W={W_rf} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM7 IF- LO+ net9 AGND nfet_03v3 L={L_min} W={W_sw} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM6 IF+ LO- net9 AGND nfet_03v3 L={L_min} W={W_sw} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM5 IF- LO- net8 AGND nfet_03v3 L={L_min} W={W_sw} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM4 IF+ LO+ net8 AGND nfet_03v3 L={L_min} W={W_sw} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+RD1 VDD_M9 IF+ {R_load} m=1
+RD2 VDD_M9 IF- {R_load} m=1
+RG1 net6 net7 {R_gate} m=1
+RG2 net5 net4 {R_gate} m=1
+LG1 RF+ net6 {L_gate} m=1
+LG2 net4 RF- {L_gate} m=1
+Rbias1 VDDBias net1 {R_bias} m=1
+x2 VINSwitch net10 VDDBias AGND inverter
+x1 VINSwitch net10 net3 MOSBIUS net2 VDDBias AGND Switch
+XCGS2 net5 net3 cap_mim_2f0_m3m4_noshield c_width=5e-6 c_length=5e-6 m=1
+XCGS1 net7 net3 cap_mim_2f0_m3m4_noshield c_width=5e-6 c_length=5e-6 m=1
+**** begin user architecture code
+
+
+* --- Transistor Length ---
+.param L_min = 0.28u
+
+* --- Transistor W/L Ratios ---
+.param WL_rf_ratio       = 80
+.param WL_sw_ratio       = 40
+.param WL_bias_ref_ratio = 10
+.param WL_bias_out_ratio = 60
+
+* --- Resistors ---
+.param R_load = 600
+.param R_bias = 7.5k
+
+* --- Impedance Matching ---
+.param R_gate = 50
+.param C_gate = 4.7p
+.param L_gate = 950n
+
+* --- Calculated Transistor Widths ---
+.param W_rf       = {WL_rf_ratio * L_min}
+.param W_sw       = {WL_sw_ratio * L_min}
+.param W_bias_ref = {WL_bias_ref_ratio * L_min}
+.param W_bias_out = {WL_bias_out_ratio * L_min}
+
+
+**** end user architecture code
+**.ends
+
+* expanding   symbol:  /foss/designs/M9-ProfMorbius-RF-Chip/designs/libs/Inverter/inverter.sym # of pins=4
+** sym_path: /foss/designs/M9-ProfMorbius-RF-Chip/designs/libs/Inverter/inverter.sym
+** sch_path: /foss/designs/M9-ProfMorbius-RF-Chip/designs/libs/Inverter/inverter.sch
+.subckt inverter IN OUT VP VN
+*.ipin IN
+*.opin OUT
+*.ipin VP
+*.ipin VN
+XM1 OUT IN VN VN nfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM2 OUT IN VP VP pfet_03v3 L=0.28u W=0.22u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+.ends
+
+
+* expanding   symbol:  /foss/designs/M9-ProfMorbius-RF-Chip/designs/libs/Mixer/Switch.sym # of pins=7
+** sym_path: /foss/designs/M9-ProfMorbius-RF-Chip/designs/libs/Mixer/Switch.sym
+** sch_path: /foss/designs/M9-ProfMorbius-RF-Chip/designs/libs/Mixer/Switch.sch
+.subckt Switch VC+ VC- MIXER-Tail MOSBIUS ONCHIP VDD-Bias GND
+*.iopin MIXER-Tail
+*.iopin ONCHIP
+*.iopin MOSBIUS
+*.ipin VDD-Bias
+*.ipin GND
+*.ipin VC+
+*.ipin VC-
+**** begin user architecture code
+
+
+* --- Transistor Length ---
+.param L_min = 0.28u
+
+* --- Transistor W/L Ratios ---
+.param WL_tser_ratio       = 28
+.param WL_rser_ratio       = 10
+.param WL_rshunt_ratio     = 3
+.param WL_tshunt_ratio     = 14
+
+* --- Resistors ---
+.param R_load = 140k
+
+
+* --- Calculated Transistor Widths ---
+.param W_tser     = {WL_tser_ratio * L_min}
+.param W_rser     = {WL_rser_ratio * L_min}
+.param W_rshunt   = {WL_rshunt_ratio * L_min}
+.param W_tshunt   = {WL_tshunt_ratio * L_min}
+
+
+**** end user architecture code
+XM1 net1 net6 ONCHIP net13 nfet_03v3 L={L_min} W={W_tser} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM2 MIXER-Tail net8 net2 net15 nfet_03v3 L={L_min} W={W_rser} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM3 ONCHIP net24 net28 net20 nfet_03v3 L={L_min} W={W_tshunt} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM4 MOSBIUS net31 GND net32 nfet_03v3 L={L_min} W={W_rshunt} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM5 MIXER-Tail net7 net1 net14 nfet_03v3 L={L_min} W={W_tser} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+RD1 VC+ net6 {R_load} m=1
+RD2 VC+ net7 {R_load} m=1
+RD3 VC- net8 {R_load} m=1
+RD4 VC- net9 {R_load} m=1
+RD5 VC- net10 {R_load} m=1
+RD6 VC- net11 {R_load} m=1
+RD7 VC- net12 {R_load} m=1
+RD8 net13 VDD-Bias {R_load} m=1
+RD9 net14 VDD-Bias {R_load} m=1
+RD10 net15 VDD-Bias {R_load} m=1
+RD11 net16 VDD-Bias {R_load} m=1
+RD12 net17 VDD-Bias {R_load} m=1
+RD13 net18 VDD-Bias {R_load} m=1
+RD14 net19 VDD-Bias {R_load} m=1
+RD15 net20 VDD-Bias {R_load} m=1
+RD16 net21 VDD-Bias {R_load} m=1
+RD17 net22 VDD-Bias {R_load} m=1
+RD18 net23 VDD-Bias {R_load} m=1
+RD19 VC- net24 {R_load} m=1
+RD20 VC- net25 {R_load} m=1
+RD21 VC- net26 {R_load} m=1
+RD22 VC- net27 {R_load} m=1
+XM6 net2 net9 net3 net16 nfet_03v3 L={L_min} W={W_rser} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM7 net3 net10 net4 net17 nfet_03v3 L={L_min} W={W_rser} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM8 net4 net11 net5 net18 nfet_03v3 L={L_min} W={W_rser} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM9 net5 net12 MOSBIUS net19 nfet_03v3 L={L_min} W={W_rser} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+RD23 VC+ net31 {R_load} m=1
+XM10 net28 net25 net29 net21 nfet_03v3 L={L_min} W={W_tshunt} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM11 net29 net26 net30 net22 nfet_03v3 L={L_min} W={W_tshunt} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XM12 net30 net27 GND net23 nfet_03v3 L={L_min} W={W_tshunt} nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u'
++ pd='2*int((nf+1)/2) * (W/nf + 0.18u)' ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+RD24 net32 VDD-Bias {R_load} m=1
+.ends
+
+.end
+
